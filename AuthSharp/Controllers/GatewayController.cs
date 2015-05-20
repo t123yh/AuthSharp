@@ -13,6 +13,12 @@ namespace AuthSharp.Controllers
         // GET: /Gateway/Ping
         /// <summary>
         /// 网关的心跳操作。
+        /// 当网关上 WiFiDog 启动时，将访问此操作，确认当前服务器是否为验证服务器。
+        /// 如果服务器没有返回“Pong”，则视为服务器无效， WiFiDog 不会设置任何防火墙规则。
+        /// 如果服务器返回“Pong”，则视为服务器有效，WiFiDog 将会正常运行。
+        /// WiFiDog 在运行时会间隔一定的时间发送心跳包（Ping），如果服务器正常回复则继续运行，如果服务器没有正常回复，
+        /// 则会尝试服务器列表的下一个服务器。如果所有服务器都无法正常工作，WiFiDog 则会清除所有防火墙规则，
+        /// 一直循环 Ping 服务器列表的所有服务器，直到有一个服务器正常回复才会继续运行。
         /// </summary>
         /// <param name="gw_id">网关 ID （数据库中为 GatewayName）。</param>
         /// <param name="sys_uptime">系统启动的时间。</param>
@@ -33,6 +39,9 @@ namespace AuthSharp.Controllers
         
         /// <summary>
         /// 网关请求验证用户的操作。
+        /// 在新用户访问网络时，WiFiDog 会将新用户重定向至 /User/Login，然后由验证服务器将用户重定向至
+        /// http://{网关 IP}:{网关端口}/wifidog/auth?token={随机生成的 token}。网关在收到请求时，即会访问此方法，
+        /// 判断用户是否能够上网。具体返回值及下一步操作见 returns 一节。
         /// </summary>
         /// <param name="stage">当前操作的类型：login 为用户首次登陆的验证；counter 为正常上网时的验证。</param>
         /// <param name="ip">用户相对于网关的 IP。</param>
@@ -46,7 +55,7 @@ namespace AuthSharp.Controllers
         /// 返回值为 Auth: n
         /// 可能的 n 的值及对应网关动作的有：
         /// 0：用户已被禁止访问。网关将删除规则，用户将被视为新用户。用户将被定向到配置文件中 MsgScriptPathFragment 所指定的地址（在 AuthSharp 中为 /User/Message）。
-        /// 1：允许用户访问。网关将允许用户访问网络（按照配置文件 known-users 一节来设定针对该用户的防火墙规则）并定期（配置文件中设定间隔）执行 Auth 操作。
+        /// 1：允许用户访问。网关将允许用户访问网络（按照配置文件 known-users 一节来设定针对该用户的防火墙规则）并定期（配置文件中设定间隔）执行 Auth 操作。用户将被重定向至配置文件中 PortalScriptPathFragment 所指向的地址（在 WiFiDog 中为 /User/Portal）。
         /// 5：用户正在执行认证操作（可能的情况为用户正在使用外部授权提供程序登陆）。网关将按照配置文件 validating-users 一节来设定针对该用户的防火墙规则。
         /// 6：用户认证超时。网关将删除用户规则。
         /// -1：服务器错误。网关将无动作。
