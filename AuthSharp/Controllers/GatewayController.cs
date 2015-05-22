@@ -38,10 +38,8 @@ namespace AuthSharp.Controllers
         }
         
         /// <summary>
-        /// 网关请求验证用户的操作。
-        /// 在新用户访问网络时，WiFiDog 会将新用户重定向至 /User/Login，然后由验证服务器将用户重定向至
-        /// http://{网关 IP}:{网关端口}/wifidog/auth?token={随机生成的 token}。网关在收到请求时，即会访问此方法，
-        /// 判断用户是否能够上网。具体返回值及下一步操作见 returns 一节。
+        /// 网关请求验证用户的操作。网关在收到请求时，即会访问此方法，
+        /// 通过token判断用户是否能够上网。具体返回值及下一步操作见 returns 一节。
         /// </summary>
         /// <param name="stage">当前操作的类型：login 为用户首次登陆的验证；counter 为正常上网时的验证。</param>
         /// <param name="ip">用户相对于网关的 IP。</param>
