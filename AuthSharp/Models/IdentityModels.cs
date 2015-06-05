@@ -16,7 +16,14 @@ namespace AuthSharp.Models
             // 在此处添加自定义用户声明
             return userIdentity;
         }
+
+        public int TrafficRemaining { get; set; }
     }
+
+    //public class IdentityRole : IdentityRole
+    //{
+        
+    //}
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
@@ -29,5 +36,13 @@ namespace AuthSharp.Models
         {
             return new ApplicationDbContext();
         }
+
+        static ApplicationDbContext()
+        {
+            // 在第一次启动网站时初始化数据库添加管理员用户凭据和 admin 角色到数据库
+            Database.SetInitializer<ApplicationDbContext>(new ApplicationDbInitializer());
+        }
+
+        //public System.Data.Entity.DbSet<AuthSharp.Models.ApplicationUser> ApplicationUsers { get; set; }
     }
 }

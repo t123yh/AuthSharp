@@ -40,7 +40,7 @@ namespace AuthSharp
         {
         }
 
-        public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context) 
+        public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context)
         {
             var manager = new ApplicationUserManager(new UserStore<ApplicationUser>(context.Get<ApplicationDbContext>()));
             // 配置用户名的验证逻辑
@@ -81,10 +81,27 @@ namespace AuthSharp
             var dataProtectionProvider = options.DataProtectionProvider;
             if (dataProtectionProvider != null)
             {
-                manager.UserTokenProvider = 
+                manager.UserTokenProvider =
                     new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity"));
             }
             return manager;
+        }
+    }
+
+    public class ApplicationRoleManager : RoleManager<IdentityRole>
+    {
+        private RoleStore<IdentityRole> roleStore;
+
+        public static ApplicationRoleManager Create(IdentityFactoryOptions<ApplicationRoleManager> options, IOwinContext context)
+        {
+            var manager = new ApplicationRoleManager(new RoleStore<IdentityRole>(context.Get<ApplicationDbContext>()));
+            return manager;
+        }
+        public ApplicationRoleManager(RoleStore<IdentityRole> roleStore)
+            : base(roleStore)
+        {
+            // TODO: Complete member initialization
+            this.roleStore = roleStore;
         }
     }
 
@@ -106,4 +123,52 @@ namespace AuthSharp
             return new ApplicationSignInManager(context.GetUserManager<ApplicationUserManager>(), context.Authentication);
         }
     }
+
+    public class ApplicationDbInitializer : DropCreateDatabaseAlways<ApplicationDbContext>
+    {
+
+        protected override void Seed(ApplicationDbContext context)
+        {
+            InitializeIdentityForEF(context);
+            base.Seed(context);
+        }
+
+        public static void InitializeIdentityForEF(ApplicationDbContext db)
+        {
+            var userManager = HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            //new ApplicationUserManager(new UserStore<ApplicationUser>(new ApplicationDbContext()));
+            var roleManager = HttpContext.Current.GetOwinContext().Get<ApplicationRoleManager>();   
+            //new ApplicationRoleManager(new RoleStore<IdentityRole>(new ApplicationDbContext())); 
+            const string adminRoleName = "Administrators";
+            var originRoles = new[] {
+                new { Name = adminRoleName, DisplayName = "系统管理员组" } ,
+                new { Name = "Users", DisplayName = "用户组" } 
+            };
+            foreach (var item in originRoles)
+            {
+                if (!roleManager.RoleExists(item.Name))
+                {
+                    IdentityRole administrators = new IdentityRole(item.Name);
+                    IdentityResult result = roleManager.Create(administrators);
+                    if (!result.Succeeded) throw new HttpException(string.Concat(result.Errors));
+                }
+            }
+
+            const string adminName = "tianyh2000@163.com";
+            const string password="$AuthSharp$";
+
+            if (userManager.FindByName(adminName) == null)
+            {
+                ApplicationUser adminUser = new ApplicationUser() { UserName = adminName, Email = adminName };
+                var result = userManager.Create(adminUser, password);
+                if (!result.Succeeded) throw new HttpException(string.Concat(result.Errors));
+                result = userManager.AddToRole(adminUser.Id, adminRoleName);
+            }
+            
+        }
+    }
+
+    
+
+    
 }
