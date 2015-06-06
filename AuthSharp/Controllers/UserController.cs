@@ -22,8 +22,15 @@ namespace AuthSharp.Controllers
         /// <param name="gw_id">网关 ID （数据库中为 GatewayName）。</param>
         /// <param name="url">用户正在尝试访问的 URL。</param>
         /// <returns>当用户成功登陆时重定向至网关（正式实现中有可能是一个确认上网页面）。</returns>
-        [Authorize]
+        [Authorize, HttpGet]
         public ActionResult Login(string gw_address, string gw_port, string gw_id, string url)
+        {
+            ViewBag.UserName = User.Identity.Name;
+            return View();
+        }
+
+        [Authorize, HttpPost, ActionName("Login")]
+        public ActionResult LoginConfirmed(string gw_address, string gw_port, string gw_id)
         {
             return Redirect(string.Format("http://{0}:{1}/wifidog/auth?token={2}", gw_address, gw_port, "Token_here"));
         }
