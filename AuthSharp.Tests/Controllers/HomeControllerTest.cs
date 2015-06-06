@@ -13,7 +13,7 @@ namespace AuthSharp.Tests.Controllers
     public class HomeControllerTest
     {
         [TestMethod]
-        public void Index()
+        public void IndexIsNotNull()
         {
             // Arrange
             HomeController controller = new HomeController();
@@ -39,7 +39,7 @@ namespace AuthSharp.Tests.Controllers
         }
 
         [TestMethod]
-        public void Contact()
+        public void ContactIsNotNull()
         {
             // Arrange
             HomeController controller = new HomeController();
