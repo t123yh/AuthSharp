@@ -1,10 +1,12 @@
-﻿using System;
+﻿using AuthSharp.Controllers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AuthSharp.Controllers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Web.Mvc;
+
 namespace AuthSharp.Controllers.Tests
 {
     [TestClass()]
@@ -14,28 +16,16 @@ namespace AuthSharp.Controllers.Tests
         public void LoginTest()
         {
             UserController userController = new UserController();
-            Assert.IsNotNull(userController);
+            Assert.IsNotNull(userController.Login("","","",""));
 
         }
 
-        public void LoginTest2() { }
-
-        [TestMethod()]
+        [TestMethod]
         public void LoginConfirmedTest()
         {
-            throw new NotImplementedException();
-        }
-
-        [TestMethod()]
-        public void PortalTest()
-        {
-            throw new NotImplementedException();
-        }
-
-        [TestMethod()]
-        public void MessageTest()
-        {
-            throw new NotImplementedException();
+            //UserController userController = new UserController();
+            //var result = userController.LoginConfirmed("", "", "") as RedirectResult;
+            //Assert.AreEqual(result.Url, "");
         }
     }
 }

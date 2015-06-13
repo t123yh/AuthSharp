@@ -1,15 +1,16 @@
-﻿using System;
+﻿using AuthSharp.Models;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Diagnostics;
 
 namespace AuthSharp.Controllers
 {
     public class GatewayController : Controller
     {
-
+        ApplicationDbContext db = new ApplicationDbContext();
         // GET: /Gateway/Ping
         /// <summary>
         /// 网关的心跳操作。
@@ -60,10 +61,23 @@ namespace AuthSharp.Controllers
         /// </returns>
         public string Auth(string stage, string ip, string mac, string token, long incoming, long outgoing, long incomingdelta, long outgoingdelta)
         {
-            // 此处验证操作大致如下：
-            // 1. 使用 token 找到当前用户并扣除流量；
-            // 2. 判断用户流量是否足够来决定用户是否能够继续上网。
-            return "Auth: 1";
+            Guid tokenGuid;
+            if (!Guid.TryParse(token, out tokenGuid))
+            {
+                return "Auth: 0";
+            }
+            if (db.Tokens.Any(item => item.Token == tokenGuid))
+            {
+                UserToken tokenObject = db.Tokens.Single(item => item.Token == tokenGuid);
+                tokenObject.UpdateTime = DateTime.Now;
+                tokenObject.User.TrafficRemaining -= incomingdelta + outgoingdelta;
+                db.SaveChanges();
+                if (tokenObject.User.TrafficRemaining > 0)
+                {
+                    return "Auth: 1";
+                }
+            }
+            return "Auth: 0";
         }
     }
 }

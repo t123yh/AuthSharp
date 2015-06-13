@@ -1,14 +1,39 @@
-﻿using System;
+﻿using AuthSharp.Models;
+using Microsoft.AspNet.Identity.Owin;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using System.Diagnostics;
 
 namespace AuthSharp.Controllers
 {
     public class UserController : Controller
     {
+        ApplicationDbContext db = new ApplicationDbContext();
+        private ApplicationUserManager _userManager;
+        public ApplicationUserManager UserManager
+        {
+            get
+            {
+                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            }
+            private set
+            {
+                _userManager = value;
+            }
+        }
+
+        public ApplicationUser CurrentApplicationUser
+        {
+            get
+            {
+                return db.Users.Single(user => user.UserName == User.Identity.Name);
+            }
+        }
+
         // GET: Login
         /// <summary>
         /// 当新用户通过网关希望上网时，网关会将用户重定向到此页面，
@@ -26,13 +51,29 @@ namespace AuthSharp.Controllers
         public ActionResult Login(string gw_address, string gw_port, string gw_id, string url)
         {
             ViewBag.UserName = User.Identity.Name;
+            ApplicationUser currentUser = CurrentApplicationUser;
+            ViewBag.TrafficRemaining = new DataSize(currentUser.TrafficRemaining);
+            ViewData["url"] = url;
+            ViewData["gw_address"] = gw_address;
+            ViewData["gw_port"] = gw_port;
+            ViewData["gw_id"] = gw_id;
             return View();
         }
 
         [Authorize, HttpPost, ActionName("Login")]
-        public ActionResult LoginConfirmed(string gw_address, string gw_port, string gw_id)
+        public ActionResult LoginConfirmed(string gw_address, string gw_port, string gw_id, string url)
         {
-            return Redirect(string.Format("http://{0}:{1}/wifidog/auth?token={2}", gw_address, gw_port, "Token_here"));
+            var newToken = new UserToken ()
+            {
+                Token = Guid.NewGuid(),
+                UpdateTime = DateTime.Now,
+                User = CurrentApplicationUser
+            };
+            Response.Cookies["url"].Value = url;
+            Response.Cookies["url"].Expires = DateTime.Now + new TimeSpan(0, 5, 0);
+            db.Tokens.Add(newToken);
+            db.SaveChanges();
+            return Redirect(string.Format("http://{0}:{1}/wifidog/auth?token={2}", gw_address, gw_port, newToken));
         }
 
         /// <summary>
@@ -40,9 +81,10 @@ namespace AuthSharp.Controllers
         /// </summary>
         /// <param name="gw_id">网关 ID。</param>
         /// <returns>向用户显示的视图。</returns>
-        public string Portal(string gw_id)
+        public ActionResult Portal(string gw_id)
         {
-            return "Auth Succeedeed. Gateway ID is " + gw_id;
+            ViewData["gw_id"] = gw_id;
+            return View();
         }
 
         /// <summary>
@@ -55,9 +97,23 @@ namespace AuthSharp.Controllers
         /// failed_validation: 用户认证超时（Auth: 6）。
         /// </param>
         /// <returns></returns>
-        public string Message(string message)
+        public ActionResult Message(string message)
         {
-            return "Message: " + message;
+            switch(message)
+            {
+                case "denied":
+                    if (CurrentApplicationUser.TrafficRemaining <= 0)
+                    {
+                        ViewBag.Message = "流量不足。请联系管理员充值。";
+                        return View();
+                    }
+                    else
+                    {
+                        return RedirectToAction("Login");
+                    }
+                default:
+                    return new EmptyResult();
+            }
         }
     }
 }

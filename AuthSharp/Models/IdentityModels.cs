@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System.Collections.Generic;
 
 namespace AuthSharp.Models
 {
@@ -17,13 +18,9 @@ namespace AuthSharp.Models
             return userIdentity;
         }
 
-        public int TrafficRemaining { get; set; }
+        public long TrafficRemaining { get; set; }
+        public List<UserToken> Tokens { get; set; }
     }
-
-    //public class IdentityRole : IdentityRole
-    //{
-        
-    //}
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
@@ -43,6 +40,6 @@ namespace AuthSharp.Models
             Database.SetInitializer<ApplicationDbContext>(new ApplicationDbInitializer());
         }
 
-        //public System.Data.Entity.DbSet<AuthSharp.Models.ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<UserToken> Tokens { get; set; }
     }
 }

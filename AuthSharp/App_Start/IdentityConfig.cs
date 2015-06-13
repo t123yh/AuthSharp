@@ -1,16 +1,16 @@
-﻿using System;
+﻿using AuthSharp.Models;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin;
+using Microsoft.Owin.Security;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin;
-using Microsoft.Owin.Security;
-using AuthSharp.Models;
 
 namespace AuthSharp
 {
@@ -137,12 +137,15 @@ namespace AuthSharp
         {
             var userManager = HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
             //new ApplicationUserManager(new UserStore<ApplicationUser>(new ApplicationDbContext()));
-            var roleManager = HttpContext.Current.GetOwinContext().Get<ApplicationRoleManager>();   
+            var roleManager = HttpContext.Current.GetOwinContext().Get<ApplicationRoleManager>();
             //new ApplicationRoleManager(new RoleStore<IdentityRole>(new ApplicationDbContext())); 
+
             const string adminRoleName = "Administrators";
+            const string userRoleName = "Users";
+
             var originRoles = new[] {
                 new { Name = adminRoleName, DisplayName = "系统管理员组" } ,
-                new { Name = "Users", DisplayName = "用户组" } 
+                new { Name = userRoleName, DisplayName = "用户组" } 
             };
             foreach (var item in originRoles)
             {
@@ -153,22 +156,30 @@ namespace AuthSharp
                     if (!result.Succeeded) throw new HttpException(string.Concat(result.Errors));
                 }
             }
-
-            const string adminName = "tianyh2000@163.com";
-            const string password="$AuthSharp$";
-
-            if (userManager.FindByName(adminName) == null)
+            //const string adminName = "tianyh2000@163.com";
+            //const string password = "$AuthSharp$";
+            var testUsers = new[]{
+                new { Name = "tianyh2000@163.com", Password = "$AuthSharp$", RoleName = adminRoleName } ,
+                new { Name = "t@t.t", Password = "$Test$", RoleName = userRoleName } 
+            };
+            foreach (var user in testUsers)
             {
-                ApplicationUser adminUser = new ApplicationUser() { UserName = adminName, Email = adminName };
-                var result = userManager.Create(adminUser, password);
-                if (!result.Succeeded) throw new HttpException(string.Concat(result.Errors));
-                result = userManager.AddToRole(adminUser.Id, adminRoleName);
+                if (userManager.FindByName(user.Name) == null)
+                {
+                    ApplicationUser newUser = new ApplicationUser() { UserName = user.Name, Email = user.Name, TrafficRemaining = 3 * 1024 * 1024 };
+                    var result = userManager.Create(newUser, user.Password);
+                    if (!result.Succeeded) throw new HttpException(string.Concat(result.Errors));
+                    //添加角色
+                    result = userManager.AddToRole(newUser.Id, user.RoleName);
+                    //设置剩余流量
+                    //newUser.TrafficRemaining = 3 * 1024 * 1024;
+                }
             }
-            
+
         }
     }
 
-    
 
-    
+
+
 }

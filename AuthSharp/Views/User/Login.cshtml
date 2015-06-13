@@ -1,8 +1,20 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "确认上网";
 }
 
 <h2>@ViewBag.Title</h2>
 <p>当前登录用户为：@ViewBag.UserName</p>
-
+<p>
+    剩余流量：@*@(ViewBag.TrafficRemaining.ToString(new AuthSharp.Models.DataSizeFormatter()))*@
+    @ViewBag.TrafficRemaining
+</p>
+<p>
+    @using (Html.BeginForm("Login", "User", FormMethod.Post))
+    {
+        @Html.Hidden("gw_address", (string)ViewData["gw_address"])
+        @Html.Hidden("gw_port", (string)ViewData["gw_port"])
+        @Html.Hidden("gw_id", (string)ViewData["gw_id"])
+        @Html.Hidden("url", (string)ViewData["url"])
+        <input type="submit" value="确定上网" class="btn btn-primary" />
+    }
+</p>
