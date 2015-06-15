@@ -1,7 +1,17 @@
-﻿
+﻿@model AuthSharp.Models.DeleteUserViewModel
+
 @{
     ViewBag.Title = "删除用户";
 }
 
 <h2>@ViewBag.Title</h2>
-
+@using (Html.BeginForm("Delete", "UsersAdministration", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.HiddenFor(m => m.UserID)
+    <p>真的要删除 @Model.UserName 吗？</p>
+    <div class="form-group">
+        <div class="col-md-10">
+            <input type="submit" value="删除" class="btn btn-danger" />
+        </div>
+    </div>
+}

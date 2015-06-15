@@ -10,20 +10,20 @@
         @using (Html.BeginForm("Recharge", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
         {
             @Html.AntiForgeryToken()
-            <h4>请填写你希望充值的流量，并联系管理员。</h4>
+            <h4>请填写你希望充值的流量。</h4>
             <hr />
-            <div class="form-group">
+            <div class="col-md-offset-2 col-sm-offset-1 col-xs-offset-1 form-group">
                 @Html.LabelFor(m => m.RechargeValue)
-                    @Html.TextBoxFor(m => m.RechargeValue, new { @class = "form-control" })
-                    @Html.ValidationMessageFor(m => m.RechargeValue, "", new { @class = "text-danger" })
+                @Html.TextBoxFor(m => m.RechargeValue, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.RechargeValue, "", new { @class = "text-danger" })
             </div>
 
-            <div class="form-group">
+            <div class="col-md-offset-2 col-sm-offset-1 col-xs-offset-1 form-group">
                 @Html.LabelFor(m => m.ValueUnit)
                 @Html.RadioButtonFor(m => m.ValueUnit, RechargeValueUnit.GB) GB
                 @Html.RadioButtonFor(m => m.ValueUnit, RechargeValueUnit.MB) MB
             </div>
-            
+
             <input type="submit" value="充值" class="btn btn-default" />
         }
     </section>

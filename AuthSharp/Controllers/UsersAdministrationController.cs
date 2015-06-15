@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace AuthSharp.Controllers
 {
+
     [Authorize(Roles = "Administrators")]
     public class UsersAdministrationController : Controller
     {
@@ -58,19 +59,29 @@ namespace AuthSharp.Controllers
         }
 
         // GET: UsersAdministration
-        public ActionResult Index()
+        public ActionResult Index(UsersAdministrationMessageId? message)
         {
+            ViewBag.StatusMessage =
+                message == UsersAdministrationMessageId.DeleteSuccess ? "成功成功删除用户。"
+                : message == UsersAdministrationMessageId.ResetPasswordSuccess ? "成功设置密码。"
+                : message == UsersAdministrationMessageId.Error ? "出现错误。"
+                : "";
             return View(NormalUsers);
         }
 
-        public ActionResult Details(string id)
+        public ActionResult Details(string id, UsersAdministrationMessageId? message)
         {
+            ViewBag.StatusMessage =
+                message == UsersAdministrationMessageId.CancelSuccess ? "成功取消请求。。"
+                            : message == UsersAdministrationMessageId.ConfirmSuccess ? "成功确认请求，流量已经进入对应账户。"
+                            : message == UsersAdministrationMessageId.Error ? "出现错误。"
+                            : "";
             var user = GetApplicationUserById(id);
             return View(user);
         }
 
 
-       
+
         private ApplicationUser GetApplicationUserById(string id)
         {
             return DbContext.Users.Single(u => u.Id == id);
@@ -81,6 +92,7 @@ namespace AuthSharp.Controllers
             return DbContext.Users.Single(u => u.UserName == username);
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public ActionResult ConfirmedRequest(string uid, Guid rid)
         {
@@ -88,14 +100,15 @@ namespace AuthSharp.Controllers
             {
                 GetApplicationUserById(uid).TrafficRemaining += request.Amount;
             });
-            return RedirectToAction("Details", new { id = uid });
+            return RedirectToAction("Details", new { id = uid, message = UsersAdministrationMessageId.ConfirmSuccess });
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public ActionResult CancelRequest(string uid, Guid rid)
         {
             RemoveRechargeRequestsWith(rid, null);
-            return RedirectToAction("Details", new { id = uid });
+            return RedirectToAction("Details", new { id = uid, message = UsersAdministrationMessageId.CancelSuccess });
         }
 
         private void RemoveRechargeRequestsWith(Guid id, Action<RechargeRequest> work)
@@ -115,6 +128,7 @@ namespace AuthSharp.Controllers
             return View(model);
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<ActionResult> SetPassword(ResetUserPasswordViewModel model)
         {
@@ -127,12 +141,44 @@ namespace AuthSharp.Controllers
             }
             string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
             var result = await UserManager.ResetPasswordAsync(user.Id, code, model.NewPassword);
-            return RedirectToAction("Details", new { id = user.Id });
+            return RedirectToAction("Index", new { id = user.Id, message = UsersAdministrationMessageId.ResetPasswordSuccess });
         }
 
-        public ActionResult Delete()
+        public async Task<ActionResult> Delete(string id)
         {
-            return View();
+            var user = await UserManager.FindByIdAsync(id);
+            if (user != null)
+            {
+                DeleteUserViewModel model = new DeleteUserViewModel() { UserID = user.Id, UserName = user.UserName };
+                return View(model);
+            }
+            else
+            {
+                return RedirectToAction("Index", new { message = UsersAdministrationMessageId.Error });
+            }
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public async Task<ActionResult> DeleteConfirmed(string userid)
+        {
+            var user = await UserManager.FindByIdAsync(userid);
+            if (user != null)
+            {
+                await UserManager.DeleteAsync(user);
+                return RedirectToAction("Index", new { message = UsersAdministrationMessageId.DeleteSuccess });
+            }
+            //DbContext.Users.Remove(user);
+            //DbContext.SaveChanges();
+            return RedirectToAction("Index", new { message = UsersAdministrationMessageId.Error });
+        }
+
+        public enum UsersAdministrationMessageId
+        {
+            DeleteSuccess,
+            ResetPasswordSuccess,
+            ConfirmSuccess,
+            CancelSuccess,
+            Error,
         }
     }
 }

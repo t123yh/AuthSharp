@@ -12,7 +12,11 @@ namespace AuthSharp.Models
         [Key]
         public Guid RequestID { get; set; }
         public virtual ApplicationUser User { get; set; }
+
+        [Display(Name = "数量")]
         public DataSize Amount { get; set; }
+
+        [Display(Name = "创建时间")]
         public DateTime CreationTime { get; set; }
     }
 }

@@ -5,16 +5,16 @@
 
 <h2>@ViewBag.Title。</h2>
 
-@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+@using (Html.BeginForm("Register", "Account", new { RetrunUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
 {
     @Html.AntiForgeryToken()
-    <h4>创建新帐户。</h4>
+    <h4>创建新帐户。请使用真实姓名注册，否则不予通过。</h4>
     <hr />
     @Html.ValidationSummary("", new { @class = "text-danger" })
     <div class="form-group">
-        @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
+        @Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
-            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
         </div>
     </div>
     <div class="form-group">

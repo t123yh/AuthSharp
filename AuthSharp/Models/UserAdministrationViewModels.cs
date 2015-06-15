@@ -23,4 +23,10 @@ namespace AuthSharp.Models
         [Compare("NewPassword", ErrorMessage = "新密码和确认密码不匹配。")]
         public string ConfirmPassword { get; set; }
     }
+    
+    public class DeleteUserViewModel
+    {
+        public string UserName { get; set; }
+        public string UserID { get; set; }
+    }
 }

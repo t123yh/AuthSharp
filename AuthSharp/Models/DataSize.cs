@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.ComponentModel.DataAnnotations;
 
 namespace AuthSharp.Models
 {
@@ -14,6 +15,7 @@ namespace AuthSharp.Models
         {
             this.val = val;
         }
+                
         public virtual long Value
         {
             get { return val; }

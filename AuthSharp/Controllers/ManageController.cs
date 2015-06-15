@@ -60,7 +60,7 @@ namespace AuthSharp.Controllers
                 : message == ManageMessageId.Error ? "出现错误。"
                 : message == ManageMessageId.AddPhoneSuccess ? "已添加你的电话号码。"
                 : message == ManageMessageId.RemovePhoneSuccess ? "已删除你的电话号码。"
-                : message == ManageMessageId.RechargeSuccess ? "充值请求创建成功。"
+                : message == ManageMessageId.RechargeSuccess ? "充值请求创建成功。请联系管理员即可充值。"
                 : "";
 
             var model = new IndexViewModel

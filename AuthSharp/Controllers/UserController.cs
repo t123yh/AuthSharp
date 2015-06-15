@@ -65,6 +65,7 @@ namespace AuthSharp.Controllers
             ApplicationUser currentUser = CurrentApplicationUser;
             ViewBag.UserName = currentUser.UserName;
             ViewBag.TrafficRemaining = new DataSize(currentUser.TrafficRemaining);
+            ViewBag.CanPass = ViewBag.TrafficRemaining > 0;
             ViewData["url"] = url;
             ViewData["gw_address"] = gw_address;
             ViewData["gw_port"] = gw_port;

@@ -5,7 +5,7 @@
 }
 
 <h2>详细信息</h2>
-
+<p class="text-success">@ViewBag.StatusMessage</p>
 <div>
     <h4>@Model.UserName</h4>
     <hr />
@@ -32,6 +32,7 @@
                         @Html.Partial("RechargeRequestsDetailsPartial", request)
                         @using (Html.BeginForm("ConfirmedRequest", "UsersAdministration", FormMethod.Post))
                         {
+                            @Html.AntiForgeryToken()
                             @*@Html.Hidden("id", Guid.NewGuid())*@
                             <input type="hidden" id="rid" name="rid" value="@request.RequestID" />
                             <input type="hidden" id="uid" name="uid" value="@Model.Id" />
@@ -39,10 +40,11 @@
                         }
                         @using (Html.BeginForm("CancelRequest", "UsersAdministration", FormMethod.Post))
                         {
+                            @Html.AntiForgeryToken()
                             @*@Html.Hidden("id", request.RequestID)*@
                             <input type="hidden" id="rid" name="rid" value="@request.RequestID" />
                             <input type="hidden" id="uid" name="uid" value="@Model.Id" />
-                            <input type="submit" value="删除" class="btn-link" />
+                            <input type="submit" value="取消" class="btn-link" />
                         }
                     </li>
                 }
