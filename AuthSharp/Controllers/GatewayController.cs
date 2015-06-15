@@ -5,12 +5,38 @@ using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity.Owin;
+using System.Threading.Tasks;
 
 namespace AuthSharp.Controllers
 {
     public class GatewayController : Controller
     {
-        ApplicationDbContext db = new ApplicationDbContext();
+        ApplicationDbContext _dbContext = new ApplicationDbContext();
+        public ApplicationDbContext DbContext
+        {
+            get
+            {
+                return _dbContext ?? HttpContext.GetOwinContext().Get<ApplicationDbContext>();
+            }
+            private set
+            {
+                _dbContext = value;
+            }
+        }
+        ApplicationUserManager _userManager;
+        public ApplicationUserManager UserManager
+        {
+            get
+            {
+                return _userManager ?? (_userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>());
+            }
+            private set
+            {
+                _userManager = value;
+            }
+        }
+
         // GET: /Gateway/Ping
         /// <summary>
         /// 网关的心跳操作。
@@ -37,7 +63,7 @@ namespace AuthSharp.Controllers
             // 2. 将各种信息（启动时间，系统负载，内存空闲，最后一次心跳的时间）写入数据库。
             return "Pong";
         }
-        
+
         /// <summary>
         /// 网关请求验证用户的操作。网关在收到请求时，即会访问此方法，
         /// 通过token判断用户是否能够上网。具体返回值及下一步操作见 returns 一节。
@@ -59,22 +85,36 @@ namespace AuthSharp.Controllers
         /// 6：用户认证超时。网关将删除用户规则。
         /// -1：服务器错误。网关将无动作。
         /// </returns>
-        public string Auth(string stage, string ip, string mac, string token, long incoming, long outgoing, long incomingdelta, long outgoingdelta)
+        public async Task<string> Auth(string stage, string ip, string mac, string token, long incoming, long outgoing, long incomingdelta, long outgoingdelta, string gw_id)
         {
             Guid tokenGuid;
             if (!Guid.TryParse(token, out tokenGuid))
             {
                 return "Auth: 0";
             }
-            if (db.Tokens.Any(item => item.Token == tokenGuid))
+            if (DbContext.Tokens.Any(item => item.Token == tokenGuid))
             {
-                UserToken tokenObject = db.Tokens.Single(item => item.Token == tokenGuid);
-                tokenObject.UpdateTime = DateTime.Now;
-                tokenObject.User.TrafficRemaining -= incomingdelta + outgoingdelta;
-                db.SaveChanges();
-                if (tokenObject.User.TrafficRemaining > 0)
+                UserToken tokenObject = DbContext.Tokens.Single(item => item.Token == tokenGuid);
+                if (await UserManager.IsInRoleAsync(tokenObject.User.Id, "Administrators"))
                 {
                     return "Auth: 1";
+                }
+                tokenObject.User.TrafficRemaining -= incomingdelta + outgoingdelta;
+                switch (stage)
+                {
+                    case "login":
+                    case "counters":
+                        tokenObject.UpdateTime = DateTime.Now;
+                        DbContext.SaveChanges();
+                        if (tokenObject.User.TrafficRemaining > 0)
+                        {
+                            return "Auth: 1";
+                        }
+                        break;
+                    case "logout":
+                        DbContext.Tokens.Remove(tokenObject);
+                        DbContext.SaveChanges();
+                        break;
                 }
             }
             return "Auth: 0";

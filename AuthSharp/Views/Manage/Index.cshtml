@@ -23,20 +23,27 @@
             }
             ]
         </dd>
-        <dt>外部登录名:</dt>
+        <dt>剩余流量:</dt>
         <dd>
-            @Model.Logins.Count [
-            @Html.ActionLink("管理", "ManageLogins") ]
+            @Html.DisplayTextFor(m => m.TrafficRemaining)
+            [@Html.ActionLink("充值", "Recharge")]
         </dd>
-        @*
+            @*
+            <dt>外部登录名:</dt>
+            <dd>
+                @Model.Logins.Count [
+                @Html.ActionLink("管理", "ManageLogins") ]
+            </dd>
+            *@
+            @*
             电话号码可用作双重身份验证系统中的第二验证因素。
-             
+
              请参见<a href="http://go.microsoft.com/fwlink/?LinkId=313242">此文章</a>，
                 以详细了解如何将此 ASP.NET 应用程序设置为支持使用 SMS 进行双重身份验证。
-             
+
              设置双重身份验证后，请取消注释以下块
-        *@
-        @*  
+            *@
+            @*
             <dt>电话号码:</dt>
             <dd>
                 @(Model.PhoneNumber ?? "无") [
@@ -52,29 +59,30 @@
                 }
                 ]
             </dd>
-        *@
-        <dt>双重身份验证:</dt>
-        <dd>
-            <p>
-                未配置双重身份验证提供程序。请参见<a href="http://go.microsoft.com/fwlink/?LinkId=313242">此文章</a>，
-                以详细了解如何将此 ASP.NET 应用程序设置为支持双重身份验证。
-            </p>
-            @*@if (Model.TwoFactor)
-                {
+            *@
+            @*<dt>双重身份验证:</dt>
+            <dd>
+                <p>
+                    未配置双重身份验证提供程序。请参见<a href="http://go.microsoft.com/fwlink/?LinkId=313242">此文章</a>，
+                    以详细了解如何将此 ASP.NET 应用程序设置为支持双重身份验证。
+                </p>
+                @if (Model.TwoFactor)
+                    {
 
-                    <form method="post" action="/Manage/DisableTwoFactorAuthentication">
-                        已启用
-                        <input type="submit" value="禁用" class="btn btn-link" />
-                    </form>
-                }
-                else
-                {
+                        <form method="post" action="/Manage/DisableTwoFactorAuthentication">
+                            已启用
+                            <input type="submit" value="禁用" class="btn btn-link" />
+                        </form>
+                    }
+                    else
+                    {
 
-                    <form method="post" action="/Manage/EnableTwoFactorAuthentication">
-                        已禁用
-                        <input type="submit" value="启用" class="btn btn-link" />
-                    </form>
-                }*@
-        </dd>
-    </dl>
+                        <form method="post" action="/Manage/EnableTwoFactorAuthentication">
+                            已禁用
+                            <input type="submit" value="启用" class="btn btn-link" />
+                        </form>
+                    }
+            </dd>
+            *@
+</dl>
 </div>

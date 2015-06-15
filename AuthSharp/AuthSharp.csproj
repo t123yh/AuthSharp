@@ -164,6 +164,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Controllers\UsersAdministrationController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -171,8 +172,10 @@
     <Compile Include="Models\DataSize.cs" />
     <Compile Include="Models\GatewayModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\ManageModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Token.cs" />
+    <Compile Include="Models\UserAdministrationViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -192,6 +195,9 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
     <None Include="Properties\PublishProfiles\服务器.pubxml" />
+    <None Include="Properties\PublishProfiles\本机IIS.pubxml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Icon.png" />
     <Content Include="Scripts\bootstrap.js" />
@@ -222,8 +228,6 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
     <Content Include="Views\Account\_ChangePasswordPartial.cshtml" />
@@ -252,6 +256,12 @@
     <Content Include="Views\User\Login.cshtml" />
     <Content Include="Views\User\Portal.cshtml" />
     <Content Include="Views\User\Message.cshtml" />
+    <Content Include="Views\Manage\Recharge.cshtml" />
+    <Content Include="Views\UsersAdministration\Index.cshtml" />
+    <Content Include="Views\UsersAdministration\Details.cshtml" />
+    <Content Include="Views\UsersAdministration\RechargeRequestsDetailsPartial.cshtml" />
+    <Content Include="Views\UsersAdministration\SetPassword.cshtml" />
+    <Content Include="Views\UsersAdministration\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

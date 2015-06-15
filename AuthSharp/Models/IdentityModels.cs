@@ -1,6 +1,7 @@
 ﻿using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Collections.Generic;
@@ -18,8 +19,26 @@ namespace AuthSharp.Models
             return userIdentity;
         }
 
-        public long TrafficRemaining { get; set; }
-        public List<UserToken> Tokens { get; set; }
+        [Display(Name = "剩余流量")]
+        public virtual DataSize TrafficRemaining { get; set; }
+
+        public virtual List<UserToken> Tokens { get; set; }
+
+        [Display(Name = "充值请求")]
+        public virtual List<RechargeRequest> RechargeRequests { get; set; }
+
+        [Display(Name = "用户名")]
+        public override string UserName
+        {
+            get
+            {
+                return base.UserName;
+            }
+            set
+            {
+                base.UserName = value;
+            }
+        }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
@@ -40,6 +59,20 @@ namespace AuthSharp.Models
             Database.SetInitializer<ApplicationDbContext>(new ApplicationDbInitializer());
         }
 
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public DbSet<UserToken> Tokens { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public DbSet<RechargeRequest> RechargeRequests { get; set; }
+
     }
 }

@@ -7,11 +7,28 @@ namespace AuthSharp.Models
 {
     public class IndexViewModel
     {
+        public DataSize TrafficRemaining { get; set; }
         public bool HasPassword { get; set; }
         public IList<UserLoginInfo> Logins { get; set; }
         public string PhoneNumber { get; set; }
         public bool TwoFactor { get; set; }
         public bool BrowserRemembered { get; set; }
+    }
+    public enum RechargeValueUnit
+    {
+        MB,
+        GB,
+    }
+
+    public class RechargeViewModel
+    {
+        [Required]
+        [Range(1, 1024)]
+        [Display(Name = "流量")]
+        public long RechargeValue { get; set; }
+        [Required]
+        [Display(Name = "单位")]
+        public RechargeValueUnit ValueUnit { get; set; }
     }
 
     public class ManageLoginsViewModel

@@ -12,13 +12,25 @@ namespace AuthSharp.Controllers
 {
     public class UserController : Controller
     {
-        ApplicationDbContext db = new ApplicationDbContext();
+        ApplicationDbContext _dbContext = new ApplicationDbContext();
+        public ApplicationDbContext DbContext
+        {
+            get
+            {
+                return _dbContext ?? HttpContext.GetOwinContext().Get<ApplicationDbContext>();
+            }
+            private set
+            {
+                _dbContext = value;
+            }
+        }
+
         private ApplicationUserManager _userManager;
         public ApplicationUserManager UserManager
         {
             get
             {
-                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+                return _userManager ?? (_userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>());
             }
             private set
             {
@@ -30,7 +42,7 @@ namespace AuthSharp.Controllers
         {
             get
             {
-                return db.Users.Single(user => user.UserName == User.Identity.Name);
+                return DbContext.Users.Single(user => user.UserName == User.Identity.Name);
             }
         }
 
@@ -50,8 +62,8 @@ namespace AuthSharp.Controllers
         [Authorize, HttpGet]
         public ActionResult Login(string gw_address, string gw_port, string gw_id, string url)
         {
-            ViewBag.UserName = User.Identity.Name;
             ApplicationUser currentUser = CurrentApplicationUser;
+            ViewBag.UserName = currentUser.UserName;
             ViewBag.TrafficRemaining = new DataSize(currentUser.TrafficRemaining);
             ViewData["url"] = url;
             ViewData["gw_address"] = gw_address;
@@ -71,8 +83,8 @@ namespace AuthSharp.Controllers
             };
             Response.Cookies["url"].Value = url;
             Response.Cookies["url"].Expires = DateTime.Now + new TimeSpan(0, 5, 0);
-            db.Tokens.Add(newToken);
-            db.SaveChanges();
+            DbContext.Tokens.Add(newToken);
+            DbContext.SaveChanges();
             return Redirect(string.Format("http://{0}:{1}/wifidog/auth?token={2}", gw_address, gw_port, newToken));
         }
 

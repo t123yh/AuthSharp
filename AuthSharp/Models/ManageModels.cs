@@ -7,16 +7,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AuthSharp.Models
 {
-    public class UserToken
+    public class RechargeRequest
     {
         [Key]
-        public Guid Token { get; set; }
-        public DateTime UpdateTime { get; set; }
-        // public string UserID { get; set; }
+        public Guid RequestID { get; set; }
         public virtual ApplicationUser User { get; set; }
-        public override string ToString()
-        {
-            return Token.ToString();
-        }
+        public DataSize Amount { get; set; }
+        public DateTime CreationTime { get; set; }
     }
 }

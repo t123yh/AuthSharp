@@ -3,7 +3,7 @@
 }
 
 <h2>您已经成功登录本系统。</h2>
-<p>
+<p>@{#warning 如果url失效应区别处理}
     <a href="@Response.Cookies["url"].Value" class="btn btn-primary">开始上网</a>
 </p>
 

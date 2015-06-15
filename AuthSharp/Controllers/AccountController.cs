@@ -16,6 +16,7 @@ namespace AuthSharp.Controllers
     public class AccountController : Controller
     {
         private ApplicationUserManager _userManager;
+        private ApplicationDbContext _dbContext;
 
         public AccountController()
         {
@@ -36,6 +37,18 @@ namespace AuthSharp.Controllers
             private set
             {
                 _userManager = value;
+            }
+        }
+
+        public ApplicationDbContext DbContext
+        {
+            get
+            {
+                return _dbContext ?? HttpContext.GetOwinContext().Get<ApplicationDbContext>();
+            }
+            private set
+            {
+                _dbContext = value;
             }
         }
 
@@ -154,11 +167,21 @@ namespace AuthSharp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, TrafficRemaining = 0 };
                 var result = await UserManager.CreateAsync(user, model.Password);
+                
                 if (result.Succeeded)
                 {
                     await UserManager.AddToRoleAsync(user.Id, "Users");
+                    RechargeRequest request = new RechargeRequest()
+                    {
+                        CreationTime = DateTime.Now,
+                        RequestID = Guid.NewGuid(),
+                        User = user,
+                        Amount = 512 * 1024 * 1024,
+                    };
+                    DbContext.RechargeRequests.Add(request);
+                    await DbContext.SaveChangesAsync();
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
                     
                     // 有关如何启用帐户确认和密码重置的详细信息，请访问 http://go.microsoft.com/fwlink/?LinkID=320771
@@ -221,7 +244,7 @@ namespace AuthSharp.Controllers
                 // return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 
-            // 如果我们进行到这一步时某个地方出错，则重新显示表单
+            // 如果我们进行到这一步时某个地方出错，则重新显示表单 
             return View(model);
         }
 

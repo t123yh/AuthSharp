@@ -1,0 +1,55 @@
+﻿@model AuthSharp.Models.ApplicationUser
+
+@{
+    ViewBag.Title = "详细信息";
+}
+
+<h2>详细信息</h2>
+
+<div>
+    <h4>@Model.UserName</h4>
+    <hr />
+    <dl class="dl-horizontal">
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TrafficRemaining)
+        </dt>
+
+        <dd>
+            @*@Html.DisplayFor(model => model.TrafficRemaining)*@
+            <p>@Model.TrafficRemaining</p>
+        </dd>
+
+        <dt>
+            充值请求 @Model.RechargeRequests.Count 个
+        </dt>
+
+        <dd>
+            <ul>
+                @foreach (var request in Model.RechargeRequests)
+                {
+                    <li>
+                        @Html.Partial("RechargeRequestsDetailsPartial", request)
+                        @using (Html.BeginForm("ConfirmedRequest", "UsersAdministration", FormMethod.Post))
+                        {
+                            @*@Html.Hidden("id", Guid.NewGuid())*@
+                            <input type="hidden" id="rid" name="rid" value="@request.RequestID" />
+                            <input type="hidden" id="uid" name="uid" value="@Model.Id" />
+                            <input type="submit" value="通过" class="btn-link" />
+                        }
+                        @using (Html.BeginForm("CancelRequest", "UsersAdministration", FormMethod.Post))
+                        {
+                            @*@Html.Hidden("id", request.RequestID)*@
+                            <input type="hidden" id="rid" name="rid" value="@request.RequestID" />
+                            <input type="hidden" id="uid" name="uid" value="@Model.Id" />
+                            <input type="submit" value="删除" class="btn-link" />
+                        }
+                    </li>
+                }
+            </ul>
+        </dd>
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("回到列表", "Index")
+</p>
