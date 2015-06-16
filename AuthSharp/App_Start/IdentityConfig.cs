@@ -159,14 +159,14 @@ namespace AuthSharp
             //const string adminName = "tianyh2000@163.com";
             //const string password = "$AuthSharp$";
             var testUsers = new[]{
-                new { Name = "tianyh2000@163.com", Password = "$AuthSharp$", RoleName = adminRoleName } ,
-                new { Name = "t@t.t", Password = "$Test$", RoleName = userRoleName } 
+                new { Name = "admin", Email = "tianyh2000@163.com", Password = "$AuthSharp$", RoleName = adminRoleName } ,
+                new { Name = "test", Email = "t@t.t", Password = "$Test$", RoleName = userRoleName } 
             };
             foreach (var user in testUsers)
             {
                 if (userManager.FindByName(user.Name) == null)
                 {
-                    ApplicationUser newUser = new ApplicationUser() { UserName = user.Name, Email = user.Name, TrafficRemaining = 3 * 1024 * 1024 };
+                    ApplicationUser newUser = new ApplicationUser() { UserName = user.Name, Email = user.Email, TrafficRemaining = 3 * 1024 * 1024 };
                     var result = userManager.Create(newUser, user.Password);
                     if (!result.Succeeded) throw new HttpException(string.Concat(result.Errors));
                     //添加角色
