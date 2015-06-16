@@ -49,7 +49,7 @@ namespace AuthSharp.Models
     public class LoginViewModel
     {
         [Required]
-        [Display(Name = "姓名")]
+        [Display(Name = "用户名")]
         public string UserName { get; set; }
 
         [Required]
@@ -64,8 +64,12 @@ namespace AuthSharp.Models
     public class RegisterViewModel
     {
         [Required]
-        [Display(Name = "姓名")]
+        [Display(Name = "用户名")]
         public string UserName { get; set; }
+
+        [Required]
+        [Display(Name = "真实姓名")]
+        public string RealName { get; set; }
 
         [Required]
         [EmailAddress]

@@ -12,6 +12,15 @@
     <dl class="dl-horizontal">
 
         <dt>
+            @Html.DisplayNameFor(model => model.RealName)
+        </dt>
+
+        <dd>
+            @*@Html.DisplayFor(model => model.TrafficRemaining)*@
+            <p>@Model.RealName</p>
+        </dd>
+
+        <dt>
             @Html.DisplayNameFor(model => model.TrafficRemaining)
         </dt>
 

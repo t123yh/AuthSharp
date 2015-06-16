@@ -39,6 +39,9 @@ namespace AuthSharp.Models
                 base.UserName = value;
             }
         }
+
+        [Display(Name = "真实姓名")]
+        public string RealName { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
