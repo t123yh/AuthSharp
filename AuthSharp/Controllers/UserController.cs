@@ -82,8 +82,8 @@ namespace AuthSharp.Controllers
                 UpdateTime = DateTime.Now,
                 User = CurrentApplicationUser
             };
-            Response.Cookies["url"].Value = url;
-            Response.Cookies["url"].Expires = DateTime.Now + new TimeSpan(0, 5, 0);
+            Response.Cookies["ReturnUrl"].Value = url;
+            Response.Cookies["ReturnUrl"].Expires = DateTime.Now + new TimeSpan(0, 10, 0);
             DbContext.Tokens.Add(newToken);
             DbContext.SaveChanges();
             return Redirect(string.Format("http://{0}:{1}/wifidog/auth?token={2}", gw_address, gw_port, newToken));
@@ -97,6 +97,9 @@ namespace AuthSharp.Controllers
         public ActionResult Portal(string gw_id)
         {
             ViewData["gw_id"] = gw_id;
+            string returnUrl = Request.Cookies["ReturnUrl"].Value;
+            ViewBag.ReturnUrl = returnUrl;
+            ViewBag.ShowFinishButton = !string.IsNullOrEmpty(returnUrl);
             return View();
         }
 

@@ -24,9 +24,9 @@ else
     <p>您的流量不足，不能上网。请 @Html.ActionLink("点此充值", "Recharge", "Manage") 。</p>
     <p>新用户将有 0.5 GB 的免费流量，但需要等待管理员审批后才可使用。管理员审批后可以单击下面的按钮刷新页面。</p>
     <p>如果您已经充值但流量显示为 0 ，请联系管理员通过充值请求过后刷新页面即可。</p>
-    <button id="refresh" class="btn btn-default">点击刷新</button>
+    <button id="refreshbutton" class="btn btn-default">点击刷新</button>
 }
 
 @section scripts {
-    @Scripts.Render("~/bundles/refreshbutton")
-} 
+    @Scripts.Render("~/bundles/buttonscripts")
+}
