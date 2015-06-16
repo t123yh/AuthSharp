@@ -11,10 +11,10 @@
             @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
             {
                 @Html.AntiForgeryToken()
+                <hr />
                 <p>
                     @Html.ActionLink("立即注册", "Register", new { ReturnUrl = ViewBag.ReturnUrl }, new { @class = "btn btn-success" })
                 </p>
-                <hr />
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 <div class="form-group">
                     @Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })
